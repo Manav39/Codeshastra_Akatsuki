@@ -177,6 +177,14 @@ export default function UserPage() {
               />
               <TableBody>
                 {symbols
+                  .filter((val) => (
+                    // if(filterName === "") {
+                    //   return val
+                    // }else if(val.companyName.toLowerCase().includes(filterName.toLowerCase())) {
+                    //   return val
+                    // }
+                    val.companyName.toLowerCase().includes(filterName.toLowerCase()) || val.symbol.toLowerCase().includes(filterName.toLowerCase())
+                  ))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row) => (
 
