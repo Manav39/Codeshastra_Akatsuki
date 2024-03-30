@@ -135,8 +135,8 @@ export default function UserPage() {
 
         // Create a new collection for the portfolio
         const portfolioName = `P${totalPortfolios + 1}`;
-        const portfolioCollectionRef = collection(db, 'users',data?.user?.uid, portfolioName);
-      await setDoc(doc(portfolioCollectionRef, 'portfolioId'), {});
+        // const portfolioCollectionRef = collection(db, 'users',data?.user?.uid, portfolioName);
+        // await setDoc(doc(portfolioCollectionRef, 'portfolioId'), {});
       alert("Success");
     } catch (error) {
         console.error("Error adding portfolio:", error.message);

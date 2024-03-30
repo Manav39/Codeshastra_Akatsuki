@@ -1,20 +1,16 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { faker } from '@faker-js/faker';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from '@mui/material/Typography';
 import Button from "@mui/material/Button";
-import Box from '@mui/material/Box';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import AttachMoneyOutlinedIcon from '@mui/icons-material/AttachMoneyOutlined';
 import CurrencyExchangeOutlinedIcon from '@mui/icons-material/CurrencyExchangeOutlined';
 import { usePort } from 'src/context';
 import Iconify from 'src/components/iconify';
 import { db } from 'src/firebase';
-import { doc, getDoc, setDoc, updateDoc, collection } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, collection,addDoc, getDocs,query } from 'firebase/firestore';
 import AppTasks from '../app-tasks';
 import AppNewsUpdate from '../app-news-update';
 import AppOrderTimeline from '../app-order-timeline';
@@ -47,12 +43,26 @@ export default function AppView() {
         // Create a new collection for the portfolio
         const portfolioName = `P${totalPortfolios + 1}`;
         const portfolioCollectionRef = collection(db, 'users',data?.user?.uid, portfolioName);
-      await setDoc(doc(portfolioCollectionRef, 'portfolioId'), {});
-      alert("Success");
+        await setDoc(doc(portfolioCollectionRef, 'cash'),  {
+          cash:100000,
+          portfolio:portfolioName
+        });
+          alert("Success");
     } catch (error) {
         console.error("Error adding portfolio:", error.message);
     }
   }
+
+  useEffect(() => {
+    const fetchPortfolios = async () => {
+      const q = query(collection(db, "users", data?.user?.uid,"P1"));
+      const snapshot = await getDocs(q);
+      // snapshot.forEach((docc) => {
+      //   console.log(docc.data);
+      // })
+    }
+    fetchPortfolios();
+  },[data])
 
   return (
     <Container maxWidth="xl">
@@ -60,7 +70,7 @@ export default function AppView() {
         <Typography variant="h4" sx={{ mb: 5 }}>
           Hi, {data?.user?.displayName} 👋
         </Typography>
-
+        
         <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />} onClick={addPortfolio} sx={{
           height:"40px"
         }}>

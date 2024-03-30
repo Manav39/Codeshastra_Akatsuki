@@ -24,11 +24,12 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import LoadingButton from '@mui/lab/LoadingButton';
 import { alpha, useTheme } from '@mui/material/styles';
+import { usePort } from 'src/context';
 import InputAdornment from '@mui/material/InputAdornment';
-import { auth } from 'src/firebase'; 
+import { auth, db } from 'src/firebase'; 
+import { doc, addDoc, collection, getDoc, updateDoc } from 'firebase/firestore'
 import { GoogleAuthProvider,signInWithPopup,createUserWithEmailAndPassword } from "firebase/auth";
 import { useRouter, } from 'src/routes/hooks';
-import { usePort } from 'src/context';
 import { bgGradient } from 'src/theme/css';
 import Logo from 'src/components/logo';
 import Iconify from 'src/components/iconify';
@@ -36,6 +37,8 @@ import Iconify from 'src/components/iconify';
 // ----------------------------------------------------------------------
 
 export default function LoginView() {
+
+  const { data } = usePort();
 
   function getFormattedDate(date) {
         const year = date.getFullYear();
@@ -51,38 +54,80 @@ export default function LoginView() {
   const [price, setPrice] = useState(0);
   const [margin, setMargin] = useState(0);
   const [type, setType] = useState(0);
+  const [availableCash, setAvailableCash] = useState(0);
   const theme = useTheme();
 
   useEffect(() => {
     const fetchData = async () => {
+
+      const cashRef = doc(db, 'users', data?.user?.uid,"P1","cash");
+      const snap = await getDoc(cashRef);
+      const totalcash = snap.data().cash || 0;
+      setAvailableCash(totalcash);
+
       const currDate = getFormattedDate(new Date());
     axios.get(`https://api.polygon.io/v3/reference/tickers/${id}?date=${currDate}&apiKey=6FKmFhdfak1SRxi15scxDwj2II16RQV3`)
-      .then((data) => {
-        console.log(data?.data?.results)
-        setName(data?.data?.results?.name)
+      .then((dataa) => {
+        console.log(dataa?.data?.results)
+        setName(dataa?.data?.results?.name)
         console.log(name)
-        setType(data?.data?.results?.type)
+        setType(dataa?.data?.results?.type)
       })
       .catch((err) => console.error(err))
     
     await axios.get(`https://api.polygon.io/v1/open-close/${id}/2024-03-28?adjusted=true&apiKey=6FKmFhdfak1SRxi15scxDwj2II16RQV3`)
-      .then((data) => {
-        setPrice(data?.data?.close);
+      .then((dataa) => {
+        setPrice(dataa?.data?.close);
       })
-      .catch((err) => console.error(err))
+        .catch((err) => console.error(err))
+      
     }
 
     fetchData();
 
-  },[id,name,type])
+  },[id,name,type,margin,data])
 
-  const handleClick = async() => {
-    
-  };
 
   const handleChange = (e) => {
     setQuantity(e);
     setMargin(price *e);
+  }
+
+  const addStocks = async () => {
+    try {
+        // Get the current value of the 'total' field
+        const userRef = doc(db, 'users', data?.user?.uid);
+        const userSnapshot = await getDoc(userRef);
+        const totalPortfolios = userSnapshot.data().total || 0;
+
+        // Increment the 'total' field by 1
+        // await updateDoc(userRef, {
+        //     total: totalPortfolios + 1
+        // });
+
+        // Create a new collection for the portfolio
+        // const portfolioName = `P${totalPortfolios + 1}`;
+        const portfolioCollectionRef = collection(db, 'users',data?.user?.uid, "P1");
+        await addDoc(portfolioCollectionRef, {
+          quantities: quantity,
+          buyprice: price,
+          portfolio: "P1",
+          sellprice: 0,
+          symbol: id,
+          date:getFormattedDate(new Date()),
+        });
+        const cashRef = doc(db, 'users', data?.user?.uid,"P1","cash");
+        const snap = await getDoc(cashRef);
+      const totalcash = snap.data().cash || 0;
+      setAvailableCash(totalcash - margin);
+        await updateDoc(cashRef, {
+            cash: totalcash-margin
+        });
+
+          alert("Success");
+    } catch (error) {
+        console.error("Error adding portfolio:", error.message);
+    }
   }
  
 
@@ -123,7 +168,7 @@ export default function LoginView() {
               <TextField name="quantity" label="Enter Quantity" value={quantity} onChange={(e) => handleChange(e.target.value)} />
               <TextField name="price" label="Current Price" value={price}  />
               <TextField name="margin" label="Margin Required" value={margin}  />
-              <TextField name="marginavailable" label="Availabe Margin" value="$100000"  />
+              <TextField name="marginavailable" label="Availabe Margin" value={availableCash}  />
       </Stack>
 
       <LoadingButton
@@ -133,7 +178,7 @@ export default function LoginView() {
         type="submit"
         variant="contained"
         color="inherit"
-        onClick={handleClick}
+        onClick={addStocks}
       >
         Buy
       </LoadingButton>
