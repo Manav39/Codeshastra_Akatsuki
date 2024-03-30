@@ -75,7 +75,7 @@ export default function LoginView() {
       })
       .catch((err) => console.error(err))
     
-    await axios.get(`https://api.polygon.io/v1/open-close/${id}/2024-03-28?adjusted=true&apiKey=6FKmFhdfak1SRxi15scxDwj2II16RQV3`)
+    await axios.get(`https://api.polygon.io/v1/open-close/${id}/2023-03-28?adjusted=true&apiKey=6FKmFhdfak1SRxi15scxDwj2II16RQV3`)
       .then((dataa) => {
         setPrice(dataa?.data?.close);
       })
