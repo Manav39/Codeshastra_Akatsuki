@@ -165,7 +165,7 @@ export default function Strategies() {
           sx={{
             p: 5,
             width: 1,
-            maxWidth: 420,
+            maxWidth: 500,
           }}
               >
                   
@@ -176,7 +176,7 @@ export default function Strategies() {
       <Stack spacing={3} style={{marginTop:"20px"}}>        
               <TextField name="Add Percent" label="Add percent" onChange = {(e) => setAllocation(e.target.value)}  />
       </Stack>
-                      <Typography sx={{marginTop:"20px"}}>Top 3 ETFs : {topp3[0]} {topp3[1]} {topp3[2]}</Typography>
+    <Typography sx={{marginTop:"20px"}}>Top 3 ETFs : {topp3[0]} {topp3[1]} {topp3[2]}</Typography>
       <LoadingButton
         style={{marginTop:"20px", backgroundColor:"green"}}
         fullWidth
@@ -190,7 +190,53 @@ export default function Strategies() {
       </LoadingButton>
     </>
         </Card>
-      </Stack>
+          </Stack>
+           <Stack alignItems="center" justifyContent="center" sx={{ height: 1 }}>
+              <Typography variant="h2" sx={{ marginBottom: "20px" }}>Strategy 2</Typography>
+              <Typography variant="h5" sx={{marginBottom:"20px"}}>Global Tactical Asset Allocation 13 (GTAA 13) - Mebane Faber</Typography>
+        <Card
+          sx={{
+            p: 5,
+            width: 1,
+            maxWidth: 420,
+          }}
+              >
+                  
+          <Typography variant="h4">Slice Percentage of Each Index</Typography>
+          
+
+           <>
+      {/* <Stack spacing={3} style={{marginTop:"20px"}}>        
+              <TextField name="Add Percent" label="Add percent" onChange = {(e) => setAllocation(e.target.value)}  />
+      </Stack> */}
+                      <Typography>
+                          SPY US Large Cap Value 5%<br/>
+                            MTUM US Momentum 10%<br/>
+                            IWN US Small Cap Value 5%<br/>
+                            EFA International Equities 10%<br/>
+                            EEM Emerging Market Equities 10%<br/>
+                            IEF Int-Term US Treasuries 5%<br/>
+                            BWX International Treasuries 5%<br/>
+                            LQD US Corporate Bonds 5%<br/>
+                            TLT Long-Term US Treasuries 5%<br/>
+                            DBC Commodities 10%<br/>
+                            GLD Gold 10%<br/>
+                            VNQ US Real Estate 20%<br/>
+                    </Typography>
+      <LoadingButton
+        style={{marginTop:"20px", backgroundColor:"green"}}
+        fullWidth
+        size="large"
+        type="submit"
+        variant="contained"
+        color="inherit"
+        onClick={getDetails}
+      >
+        Add
+      </LoadingButton>
+    </>
+        </Card>
+          </Stack>
     </Box>
   );
 }

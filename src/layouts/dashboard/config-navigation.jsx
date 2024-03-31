@@ -27,11 +27,11 @@ const navConfig = [
     path: '/explore',
     icon: icon('ic_cart'),
   },
-  {
-    title: 'News',
-    path: '/news',
-    icon: icon('ic_blog'),
-  },
+  // {
+  //   title: 'News',
+  //   path: '/news',
+  //   icon: icon('ic_blog'),
+  // },
   {
     title: 'login',
     path: '/login',

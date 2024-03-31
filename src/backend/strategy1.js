@@ -79,13 +79,13 @@ const strat1 = () => {
         const day = String(date.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
     }
-    const SPYCurrPrice=getPrice("SPY",getFormattedDate(new Date()));
-    const SPYMovingAvg=getMovingAvg("SPY")
+    // const SPYCurrPrice=getPrice("SPY",getFormattedDate(new Date()));
+    // const SPYMovingAvg=getMovingAvg("SPY")
     
-    //     // If SPY closes below its 10-month moving average, move the entire portfolio to cash
-        if (SPYCurrPrice < SPYMovingAvg) {
-            // movePortfolioToCash();
-        }
+    // //     // If SPY closes below its 10-month moving average, move the entire portfolio to cash
+    //     if (SPYCurrPrice < SPYMovingAvg) {
+    //         // movePortfolioToCash();
+    //     }
 
 
 };
