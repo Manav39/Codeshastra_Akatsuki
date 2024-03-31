@@ -11,11 +11,12 @@ export const MyContextProvider = ({ children }) => {
     const [data, setData] = useState([]);
   const [loggedIn, setIsLoggedIn] = useState(false);
   const [portfolio, setPortfolio] = useState("");
+  const [selectedPortfolio, setSelectedPortfolio] = useState("P1");
 
   // Define functions to update the state
 
   // Pass data and functions through the context provider
-  const value = useMemo(() => ({data,setData,loggedIn,setIsLoggedIn,portfolio,setPortfolio}), [data,setData,loggedIn,setIsLoggedIn,portfolio,setPortfolio]);
+  const value = useMemo(() => ({data,setData,loggedIn,setIsLoggedIn,portfolio,setPortfolio, selectedPortfolio, setSelectedPortfolio}), [data,setData,loggedIn,setIsLoggedIn,portfolio,setPortfolio, selectedPortfolio, setSelectedPortfolio]);
  
   // Render the context provider with its children
   return (

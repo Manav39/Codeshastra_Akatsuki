@@ -38,7 +38,7 @@ import Iconify from 'src/components/iconify';
 
 export default function LoginView() {
 
-  const { data } = usePort();
+  const { data, selectedPortfolio } = usePort();
 
   function getFormattedDate(date) {
         const year = date.getFullYear();
@@ -60,7 +60,7 @@ export default function LoginView() {
   useEffect(() => {
     const fetchData = async () => {
 
-      const cashRef = doc(db, 'users', data?.user?.uid,"P1","cash");
+      const cashRef = doc(db, 'users', data?.user?.uid,selectedPortfolio,"cash");
       const snap = await getDoc(cashRef);
       const totalcash = snap.data().cash || 0;
       setAvailableCash(totalcash);
@@ -85,7 +85,7 @@ export default function LoginView() {
 
     fetchData();
 
-  },[id,name,type,margin,data])
+  },[id,name,type,margin,data, selectedPortfolio])
 
 
   const handleChange = (e) => {
@@ -107,16 +107,16 @@ export default function LoginView() {
 
         // Create a new collection for the portfolio
         // const portfolioName = `P${totalPortfolios + 1}`;
-        const portfolioCollectionRef = collection(db, 'users',data?.user?.uid, "P1");
+        const portfolioCollectionRef = collection(db, 'users',data?.user?.uid, selectedPortfolio);
         await addDoc(portfolioCollectionRef, {
           quantities: quantity,
           buyprice: price,
-          portfolio: "P1",
+          portfolio: selectedPortfolio,
           sellprice: 0,
           symbol: id,
           date:getFormattedDate(new Date()),
         });
-        const cashRef = doc(db, 'users', data?.user?.uid,"P1","cash");
+        const cashRef = doc(db, 'users', data?.user?.uid,selectedPortfolio,"cash");
         const snap = await getDoc(cashRef);
       const totalcash = snap.data().cash || 0;
       setAvailableCash(totalcash - margin);

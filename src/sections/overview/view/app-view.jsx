@@ -31,12 +31,16 @@ import AppConversionRates from '../app-conversion-rates';
 // ----------------------------------------------------------------------
 
 export default function AppView() {
-  const { data,setPortfolio } = usePort();
+  const { data,setPortfolio, selectedPortfolio, setSelectedPortfolio } = usePort();
   const [port, setPort] = useState("");
   const [prices, setPrices] = useState({});
   const [symbol, setSymbol] = useState("");
   const [stockDetails, setStockDetails] = useState([])
   const [history, setHistory] = useState([]);
+  const [selectedValue, setSelectedValue] = useState('');
+  const [values, setValues] = useState(['P1', 'P2', 'P3']);
+  const [balance, setBalance] = useState(0);
+  const [investment, setInvestment] = useState(0);
 
   const addPortfolio = async () => {
     try {
@@ -57,6 +61,7 @@ export default function AppView() {
           cash:100000,
           portfolio:portfolioName
         });
+        setValues([...values, `P${totalPortfolios + 1}`]);
           alert("Success");
     } catch (error) {
         console.error("Error adding portfolio:", error.message);
@@ -67,7 +72,7 @@ export default function AppView() {
     const fetchPortfolios = async () => {
       setSymbol("");
       setStockDetails("");
-      const q = query(collection(db, "users", data?.user?.uid,"P1"));
+      const q = query(collection(db, "users", data?.user?.uid,selectedPortfolio));
       const snapshot = await getDocs(q);
       snapshot.forEach((docc) => {
         setStockDetails((stockDet) => [...stockDet, docc.data()]);
@@ -76,20 +81,40 @@ export default function AppView() {
 
       setStockDetails(prevStockDetails => prevStockDetails.slice(0, -1));
       setSymbol(prevSymbol => prevSymbol.slice(0, -1));
-      // const que = query(collection(db, "users", data?.user?.uid,"P1"));
+      // const que = query(collection(db, "users", data?.user?.uid,selectedPortfolio));
       // const snap = await getDocs(que);
       // snap.forEach((dod) => {
       //   console.log(dod.data());
       // })
-
     }
     fetchPortfolios();
 
+    const getDetails = async() => {
+      const cashRef = doc(db, 'users', data?.user?.uid,selectedPortfolio,"cash");
+      const snap = await getDoc(cashRef);
+      const totalcash = snap.data().cash;
+      console.log(totalcash);
+      setBalance(totalcash);
+      setInvestment(100000 - totalcash);
+    }
+    getDetails();
     // const getCurPrice = async () => {
     //   setCurr("");
       
     // }
     // getCurPrice();
+
+    const fetchPrice = async (sym) => {
+      try {
+        const response = await axios.get(`https://api.polygon.io/v1/open-close/${sym}/2024-03-28?adjusted=true&apiKey=6FKmFhdfak1SRxi15scxDwj2II16RQV3`);
+        // console.log("resp : ", response.data.close);
+        return [sym, response.data.close];
+      } catch (error) {
+        console.error('Error fetching price for sym', sym, ':', error);
+        return [sym, null];
+      }
+    };
+
      const fetchData = async () => {
       try {
         const priceData = await Promise.all(symbol.map(sym => fetchPrice(sym)));
@@ -100,20 +125,27 @@ export default function AppView() {
       }
     };
 
-    fetchData();
-
-  }, [data])
-
-  const fetchPrice = async (sym) => {
-    try {
-      const response = await axios.get(`https://api.polygon.io/v1/open-close/${sym}/2024-03-28?adjusted=true&apiKey=6FKmFhdfak1SRxi15scxDwj2II16RQV3`);
-      // console.log("resp : ", response.data.close);
-      return [sym, response.data.close];
-    } catch (error) {
-      console.error('Error fetching price for sym', sym, ':', error);
-      return [sym, null];
+    const fetchHistory =async() =>{
+      const qur = query(
+        collection(db, "users", data?.user?.uid, selectedPortfolio),
+        where('sellprice', '!=', 0),
+      );
+  
+      const snapper = await getDocs(qur);
+      setHistory("");
+      snapper.forEach(async (doccc) => {
+        setHistory((hist) => [...hist, doccc.data()]);
+      })
+      
+      setHistory(histo => histo.slice(0, -1));
     }
-  };
+
+    fetchData();
+    fetchHistory();
+
+  }, [data, selectedPortfolio])
+
+  
   
   //  const getCmp = async(symbol) => {
   //     const res = await axios.get(`https://api.polygon.io/v1/open-close/${symbol}/2023-01-09?adjusted=true&apiKey=6FKmFhdfak1SRxi15scxDwj2II16RQV3`)
@@ -123,7 +155,7 @@ export default function AppView() {
   
   const handleExit = async(item) => {
     console.log(item.quantities * prices[item.symbol]);
-    const cashRef = doc(db, 'users', data?.user?.uid,"P1","cash");
+    const cashRef = doc(db, 'users', data?.user?.uid,selectedPortfolio,"cash");
     const snap = await getDoc(cashRef);
     const totalcash = snap.data().cash || 0;
     await updateDoc(cashRef, {
@@ -131,21 +163,21 @@ export default function AppView() {
     });
 
     const q = query(
-      collection(db, "users", data?.user?.uid, "P1"),
+      collection(db, "users", data?.user?.uid, selectedPortfolio),
       where('symbol', '==', item.symbol),
       where('quantities', '==', item.quantities)
     );
     const snapsot = await getDocs(q);
 
     snapsot.forEach(async (docc) => {
-      const docRef = doc(db, "users", data?.user?.uid, "P1", docc.id);
+      const docRef = doc(db, "users", data?.user?.uid, selectedPortfolio, docc.id);
       await updateDoc(docRef, {
         sellprice: prices[item.symbol]
       });
     });
 
     const qur = query(
-      collection(db, "users", data?.user?.uid, "P1"),
+      collection(db, "users", data?.user?.uid, selectedPortfolio),
       where('sellprice', '!=', 0),
     );
 
@@ -161,7 +193,7 @@ export default function AppView() {
 
     alert("Success");
     // try {
-    //   const orderRef = doc(db, 'users', data?.user?.uid, "P1");
+    //   const orderRef = doc(db, 'users', data?.user?.uid, selectedPortfolio);
     //   const querySnapshot = await getDocs(orderRef);
     //   querySnapshot.forEach(async (doco) => {
     //     await deleteDoc(doco.ref);
@@ -177,13 +209,42 @@ export default function AppView() {
   // console.log("Manav : ", stockDetails);
   // console.log("Prices : ",prices)
   console.log("Hist : ", history);
+
+  const handleChange = (event) => {
+    setSelectedValue(event.target.value);
+    setSelectedPortfolio(event.target.value);
+  };
+
   return (
     <Container maxWidth="xl">
       <div style={{display:"flex",justifyContent:"space-between"}}>
         <Typography variant="h4" sx={{ mb: 5 }}>
           Hi, {data?.user?.displayName} 👋
         </Typography>
+
+        <Typography variant="h5" sx={{ mb: 5 }} style={{marginTop: 20}}>
+          Portfolio { selectedValue }
+        </Typography>
         
+        <select value={selectedPortfolio} onChange={handleChange}
+          style={{
+            backgroundColor: '#f2f2f2', // Light background
+            border: '1px solid #ccc', // Border
+            borderRadius: '4px', // Rounded corners
+            padding: '8px 12px', // Padding for content
+            fontSize: '16px', // Font size
+            cursor: 'pointer', // Pointer cursor on hover
+            width: "400px",
+            height: "70px"
+          }}
+        >
+          {values.map((value) => (
+            <option key={value} value={value}>
+              {value}
+            </option>
+          ))}
+        </select>
+
         <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />} onClick={addPortfolio} sx={{
           height:"40px"
         }}>
@@ -195,7 +256,7 @@ export default function AppView() {
         <Grid xs={12} sm={6} md={3}>
             <AppWidgetSummary
               title="Balance"
-              total={100000}
+              total={balance === 0 ? "0" : balance}
               color="error"
               icon={<AttachMoneyOutlinedIcon sx={{ fontSize: '3rem' }} />}
             />
@@ -204,7 +265,7 @@ export default function AppView() {
         <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
             title="Investment Value"
-            total={714000}
+            total={investment}
             color="success"
             icon={<ShoppingBagOutlinedIcon sx={{ fontSize: '3rem' }}/>}
           />
@@ -323,7 +384,7 @@ export default function AppView() {
           />
         </Grid>
         <Grid xs={12} md={6} lg={8}>
-          <Typography>Current Positions</Typography>
+          <Typography variant="h2" sx={{ mb: 2 }} style={{margin: 20}}>Current Positions</Typography>
           {stockDetails && stockDetails?.map((detail, index) => (
             <Grid item xs={12} sm={6} md={4} key={index}>
               <Card variant="outlined" style={{display:"flex",justifyContent:"space-between"}}>
@@ -337,7 +398,8 @@ export default function AppView() {
                  {/* {getCmp(detail.symbol)} */}
                 </CardContent>
                 <LoadingButton
-                  style={{marginTop:"30px", backgroundColor:"red",width:"200px",marginLeft:"20px",height:"10px"}}
+                  style={{marginTop:"30px", backgroundColor: (prices[detail.symbol] - detail.buyprice) > 0 ? "green" : "red",
+                  width:"200px",marginLeft:"20px",height:"10px", marginRight: "20px"}}
                   fullWidth
                   size="large"
                   type="submit"
@@ -361,7 +423,8 @@ export default function AppView() {
           /> */}
         </Grid>
 
-        <Grid xs={12} md={6} lg={4}>
+        <Grid xs={12} md={6} lg={4} >
+        <Typography variant="h3" sx={{ mb: 2 }} style={{margin: 20}}>Transaction History</Typography>
           {history && history.map((histo) => (
               <>
                 <Typography>Buy Price : {histo.buyprice}</Typography>
