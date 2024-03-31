@@ -8,7 +8,7 @@ export default function ProductsPage() {
   return (
     <>
       <Helmet>
-        <title> Products </title>
+        <title> Search For Stocks </title>
       </Helmet>
 
       <ProductsView />
