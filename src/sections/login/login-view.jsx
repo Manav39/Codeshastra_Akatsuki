@@ -67,8 +67,8 @@ const googleProvider = new GoogleAuthProvider();
             await setDoc(userRef, {});
 
             // Create a new collection 'P1' for the user's portfolio
-            const p1CollectionRef = collection(db, 'users', userId, 'P1');
-            await setDoc(doc(p1CollectionRef, 'portfolioId'), {});
+            // const p1CollectionRef = collection(db, 'users', userId, 'P1');
+            // // await setDoc(doc(p1CollectionRef, 'portfolioId'), {});
         }
     } catch (err) {
       console.error(err);
