@@ -71,20 +71,25 @@ const strat1 = () => {
 
     const sortedTickerNames = Object.keys(averageReturns).sort((a, b) => averageReturns[b] - averageReturns[a]);
     console.log("Top 3 tickers with highest returns:", sortedTickerNames.slice(0, 3));
-};
-function getFormattedDate(date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-}
-const SPYCurrPrice=getPrice("SPY",getFormattedDate(new Date()));
-const SPYMovingAvg=getMovingAvg("SPY")
+    return sortedTickerNames.slice(0,3);
 
-//     // If SPY closes below its 10-month moving average, move the entire portfolio to cash
-    if (SPYCurrPrice < SPYMovingAvg) {
-        // movePortfolioToCash();
+    function getFormattedDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     }
+    const SPYCurrPrice=getPrice("SPY",getFormattedDate(new Date()));
+    const SPYMovingAvg=getMovingAvg("SPY")
+    
+    //     // If SPY closes below its 10-month moving average, move the entire portfolio to cash
+        if (SPYCurrPrice < SPYMovingAvg) {
+            // movePortfolioToCash();
+        }
+
+
+};
+
 
 export default strat1;
 
