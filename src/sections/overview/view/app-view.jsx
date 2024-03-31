@@ -122,7 +122,7 @@ export default function AppView() {
 
   
   const handleExit = async(item) => {
-    console.log(item.quantities * prices[item.symbol]);
+    console.log(item.quantities * prices[item.symbol] - item.buyprice*item.quantities);
     const cashRef = doc(db, 'users', data?.user?.uid,"P1","cash");
     const snap = await getDoc(cashRef);
     const totalcash = snap.data().cash || 0;
