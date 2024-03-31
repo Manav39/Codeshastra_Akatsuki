@@ -72,7 +72,9 @@ export default function AppView() {
     const fetchPortfolios = async () => {
       setSymbol("");
       setStockDetails("");
-      const q = query(collection(db, "users", data?.user?.uid,selectedPortfolio));
+      const q = query(collection(db, "users", data?.user?.uid,selectedPortfolio),
+      where('sellprice', '==', 0)
+      );
       const snapshot = await getDocs(q);
       snapshot.forEach((docc) => {
         setStockDetails((stockDet) => [...stockDet, docc.data()]);
@@ -125,27 +127,37 @@ export default function AppView() {
       }
     };
 
-    const fetchHistory =async() =>{
-      const qur = query(
-        collection(db, "users", data?.user?.uid, selectedPortfolio),
-        where('sellprice', '!=', 0),
-      );
-  
-      const snapper = await getDocs(qur);
-      setHistory("");
-      snapper.forEach(async (doccc) => {
-        setHistory((hist) => [...hist, doccc.data()]);
-      })
-      
-      setHistory(histo => histo.slice(0, -1));
-    }
-
     fetchData();
+
+    const fetchHistory = async () => {
+          const qur = query(
+          collection(db, "users", data?.user?.uid, selectedPortfolio),
+          where('sellprice', '!=', 0),
+        );
+
+        const snapper = await getDocs(qur);
+        setHistory("");
+        snapper.forEach(async (doccc) => {
+          setHistory((hist) => [...hist, doccc.data()]);
+        })
+        
+        setHistory(histo => histo.slice(0, -1));
+        }
+
     fetchHistory();
 
   }, [data, selectedPortfolio])
 
-  
+  const fetchPrice = async (sym) => {
+    try {
+      const response = await axios.get(`https://api.polygon.io/v1/open-close/${sym}/2024-03-28?adjusted=true&apiKey=6FKmFhdfak1SRxi15scxDwj2II16RQV3`);
+      // console.log("resp : ", response.data.close);
+      return [sym, response.data.close];
+    } catch (error) {
+      console.error('Error fetching price for sym', sym, ':', error);
+      return [sym, null];
+    }
+  };
   
   //  const getCmp = async(symbol) => {
   //     const res = await axios.get(`https://api.polygon.io/v1/open-close/${symbol}/2023-01-09?adjusted=true&apiKey=6FKmFhdfak1SRxi15scxDwj2II16RQV3`)

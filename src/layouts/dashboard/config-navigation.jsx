@@ -38,8 +38,8 @@ const navConfig = [
     icon: icon('ic_lock'),
   },
   {
-    title: 'Not found',
-    path: '/404',
+    title: 'Add Cash',
+    path: '/add',
     icon: icon('ic_disabled'),
   },
 ];

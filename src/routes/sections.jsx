@@ -4,6 +4,7 @@ import { Outlet, Navigate, useRoutes } from 'react-router-dom';
 import DashboardLayout from 'src/layouts/dashboard';
 import ExploreDetails from 'src/sections/explore/ExploreDetails';
 import StockDetails from 'src/sections/stocks/StockDetails';
+import AddCash from './AddCash';
 
 export const IndexPage = lazy(() => import('src/pages/app'));
 export const BlogPage = lazy(() => import('src/pages/blog'));
@@ -56,6 +57,10 @@ export default function Router() {
     {
       path: "explore/:id",
       element: <ExploreDetails />
+    },
+    {
+      path: 'add',
+      element: <AddCash />,
     }
   ]);
 
