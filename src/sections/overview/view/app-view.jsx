@@ -67,7 +67,10 @@ export default function AppView() {
     const fetchPortfolios = async () => {
       setSymbol("");
       setStockDetails("");
-      const q = query(collection(db, "users", data?.user?.uid,"P1"));
+      const q = query(
+          collection(db, "users", data?.user?.uid, "P1"),
+          where('sellprice', '==', 0)
+        );
       const snapshot = await getDocs(q);
       snapshot.forEach((docc) => {
         setStockDetails((stockDet) => [...stockDet, docc.data()]);
@@ -101,6 +104,23 @@ export default function AppView() {
     };
 
     fetchData();
+
+    const fetchHistory = async () => {
+          const qur = query(
+          collection(db, "users", data?.user?.uid, "P1"),
+          where('sellprice', '!=', 0),
+        );
+
+        const snapper = await getDocs(qur);
+        setHistory("");
+        snapper.forEach(async (doccc) => {
+          setHistory((hist) => [...hist, doccc.data()]);
+        })
+        
+        setHistory(histo => histo.slice(0, -1));
+        }
+
+    fetchHistory();
 
   }, [data])
 

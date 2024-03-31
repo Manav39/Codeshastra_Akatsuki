@@ -56,50 +56,19 @@ export default function LoginView() {
   const [type, setType] = useState(0);
   const [vis, setVis] = useState(false);
   const [availableCash, setAvailableCash] = useState(0);
+   const [add, setAdd] = useState(0);
   const theme = useTheme();
 
   useEffect(() => {
-    const fetchData = async () => {
-
-      const cashRef = doc(db, 'users', data?.user?.uid,"P1","cash");
-      const snap = await getDoc(cashRef);
-      const totalcash = snap.data().cash || 0;
-      setAvailableCash(totalcash);
-
-      const currDate = getFormattedDate(new Date());
-    axios.get(`https://api.polygon.io/v3/reference/tickers/${id}?date=${currDate}&apiKey=6FKmFhdfak1SRxi15scxDwj2II16RQV3`)
-      .then((dataa) => {
-        console.log(dataa?.data?.results)
-        setName(dataa?.data?.results?.name)
-        console.log(name)
-        setType(dataa?.data?.results?.type)
-      })
-      .catch((err) => console.error(err))
-    
-    await axios.get(`https://api.polygon.io/v1/open-close/${id}/2023-03-28?adjusted=true&apiKey=6FKmFhdfak1SRxi15scxDwj2II16RQV3`)
-      .then((dataa) => {
-        setPrice(dataa?.data?.close);
-      })
-        .catch((err) => console.error(err))
-      
-    }
-
-    fetchData();
-
-  },[id,name,type,margin,data])
+   
+  },[])
 
 
-  const handleChange = (e) => {
-    setQuantity(e);
-    setMargin(price *e);
-  }
-
-  const addStocks = async () => {
+  
+  const handleAddCash = async () => {
     try {
         // Get the current value of the 'total' field
-        const userRef = doc(db, 'users', data?.user?.uid);
-        const userSnapshot = await getDoc(userRef);
-        const totalPortfolios = userSnapshot.data().total || 0;
+      
 
         // Increment the 'total' field by 1
         // await updateDoc(userRef, {
@@ -108,24 +77,16 @@ export default function LoginView() {
 
         // Create a new collection for the portfolio
         // const portfolioName = `P${totalPortfolios + 1}`;
-        const portfolioCollectionRef = collection(db, 'users',data?.user?.uid, "P1");
-        await addDoc(portfolioCollectionRef, {
-          quantities: quantity,
-          buyprice: price,
-          portfolio: "P1",
-          sellprice: 0,
-          symbol: id,
-          date:getFormattedDate(new Date()),
-        });
-        const cashRef = doc(db, 'users', data?.user?.uid,"P1","cash");
+      
+        const cashRef = doc(db, 'users', data?.user?.uid, "P2", "cash");
         const snap = await getDoc(cashRef);
-      const totalcash = snap.data().cash || 0;
-      if (margin > totalcash) {
-        setVis(true);
-      }
-      setAvailableCash(totalcash - margin);
+        const totalcash = parseFloat(snap.data().cash) || 0;
+
+        // Convert add to a number if it's not already
+        const addNumber = parseFloat(add) || 0;
+
         await updateDoc(cashRef, {
-            cash: totalcash-margin
+        cash: totalcash + addNumber,
         });
 
           alert("Success");
@@ -134,8 +95,7 @@ export default function LoginView() {
     }
   }
  
-
-
+    
   return (
     <Box
       sx={{
@@ -162,17 +122,12 @@ export default function LoginView() {
             maxWidth: 420,
           }}
         >
-          <Typography variant="h2">{id}</Typography>
-          <Typography variant="h5">Name : {name}</Typography>
+          <Typography variant="h5">Add Cash</Typography>
 
 
            <>
       <Stack spacing={3} style={{marginTop:"20px"}}>        
-              <TextField name="type" label="Type" value={type}  />
-              <TextField name="quantity" label="Enter Quantity" value={quantity} onChange={(e) => handleChange(e.target.value)} />
-              <TextField name="price" label="Current Price" value={price}  />
-              <TextField name="margin" label="Margin Required" value={margin}  />
-              <TextField name="marginavailable" label="Availabe Margin" value={availableCash}  />
+              <TextField name="Add Cash" label="Add cash" onChange = {(e) => setAdd(e.target.value)}  />
       </Stack>
 
       <LoadingButton
@@ -182,10 +137,9 @@ export default function LoginView() {
         type="submit"
         variant="contained"
         color="inherit"
-        onClick={addStocks}
-        disabled={vis}
+        onClick={handleAddCash}
       >
-        Buy
+        Add
       </LoadingButton>
     </>
         </Card>
