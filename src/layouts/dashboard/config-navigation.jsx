@@ -18,8 +18,8 @@ const navConfig = [
     icon: icon('ic_user'),
   },
   {
-    title: 'Watchlist',
-    path: '/watchlist',
+    title: 'Strategies',
+    path: '/strategies',
     icon: icon('ic_user'),
   },
   {

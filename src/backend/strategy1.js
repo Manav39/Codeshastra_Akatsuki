@@ -71,6 +71,7 @@ const strat1 = () => {
 
     const sortedTickerNames = Object.keys(averageReturns).sort((a, b) => averageReturns[b] - averageReturns[a]);
     console.log("Top 3 tickers with highest returns:", sortedTickerNames.slice(0, 3));
+    return sortedTickerNames.slice(0, 3);
 };
 function getFormattedDate(date) {
     const year = date.getFullYear();

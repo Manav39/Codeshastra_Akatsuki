@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { Outlet, Navigate, useRoutes } from 'react-router-dom';
+import Strategies from 'src/components/Strategies';
 
 import DashboardLayout from 'src/layouts/dashboard';
 import ExploreDetails from 'src/sections/explore/ExploreDetails';
@@ -28,7 +29,7 @@ export default function Router() {
       children: [
         { path: 'portfolio', element: <IndexPage /> },
         { path: 'trades', element: <UserPage /> },
-        { path: 'watchlist', element: <UserPage /> },
+        { path: 'strategies', element: <Strategies /> },
         { path: 'explore', element: <ProductsPage /> },
         { path: 'news', element: <BlogPage /> },
       ],
